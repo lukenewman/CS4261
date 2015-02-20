@@ -17,37 +17,34 @@ function isEmpty(object) {
 
 /* GET /places request. */
 router.get('/places', function(req, res, next) {
-  var fsUrl = 'https://api.foursquare.com/v2/venues/explore?';
-  var fsClientId = 'client_id=O0YY1XKVUHFMJY1B1Q04NHXMBAYLRS4IJRVLDWKYIKXER4AH';
-  var fsClientSecret = '&client_secret=I3YZ5Y3UK20ZIDD5GMCBDR0ZMFJH0KWB5NRS1N03TMWAYAJW&v=20130815';
-  var fsLoc = req.query.loc; // example: '&ll=49.0,6.10';
-  var fsRadius = req.query.radius; //example '&radius=1000';
-  var fsSection = req.query.section; //example '&section=food';
-  var fsLimit = '&limit=20';
+  var fsUrl = 'https://api.foursquare.com/v2/venues/explore';
 
-  console.log(
-    'Loc: ' + fsLoc +
-    '; Radius: ' + fsRadius +
-    '; Section: ' + fsSection
-  );
-  var requestUrl = fsUrl + fsClientId + fsClientSecret;
+  var requestParams = {
+    client_id: 'O0YY1XKVUHFMJY1B1Q04NHXMBAYLRS4IJRVLDWKYIKXER4AH',
+    client_secret: 'I3YZ5Y3UK20ZIDD5GMCBDR0ZMFJH0KWB5NRS1N03TMWAYAJW&v=20130815',
+    ll: req.query.loc, // example: '49.0,6.10'
+    radius: req.query.radius, //example '1000'
+    section: req.query.section,  //example 'food'
+    limit: 20
+  };
 
-  if (fsLoc !== undefined) {
-    requestUrl += '&ll=' + fsLoc;
-  } else {
-    res.send({}); //TODO send Bad request error
+  var requestUrl = fsUrl;
+
+  var paramsString = '';
+  for (var key in requestParams) {
+    if (requestParams[key] !== undefined) {
+      if (paramsString !== '') {
+        paramsString += '&';
+      }
+      paramsString += key + '=' + requestParams[key];
+    }
   }
 
-  if (fsRadius !== undefined) {
-    requestUrl += '&radius=' + fsRadius;
-  }
-  if (fsSection !== undefined) {
-    requestUrl += '&section=' + fsSection;
+  if (paramsString !== undefined) {
+    requestUrl += '?' + paramsString;
   }
 
-  requestUrl += fsLimit;
-
-  console.log('requestUrl: ' + requestUrl);
+  console.log('RequestUrl: ' + requestUrl);
 
   request(requestUrl, function (error, response, body) {
     if (!error && response.statusCode == 200) {
@@ -63,9 +60,6 @@ router.get('/places', function(req, res, next) {
   });
 
 });
-
-//https://api.foursquare.com/v2/venues/search?client_id=O0YY1XKVUHFMJY1B1Q04NHXMBAYLRS4IJRVLDWKYIKXER4AH&client_secret=I3YZ5Y3UK20ZIDD5GMCBDR0ZMFJH0KWB5NRS1N03TMWAYAJW&v=20130815&ll=49.0,6.10&query=sushi
-
 
 
 module.exports = router;
