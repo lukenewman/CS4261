@@ -61,6 +61,34 @@ router.get('/places', function(req, res, next) {
   });
 });
 
+router.get('/places/instagram/:ll', function(req, res, next) {
+	var oauth = {
+		client_id: 'c40df6cf23aa448c9c2da9007284f8e6',
+		client_secret: '8f83ed86028a498185a05bb4277fe601'
+	}
+	
+	var url = 'https://api.instagram.com/v1/locations/search'
+	
+	var requestParams = {
+		lat: req.params.ll.split(',')[0]
+		lng: req.params.ll.split(',')[1]
+	}
+	
+	var requestUrl = createCompleteUrl(url, requestParams)
+	console.log('RequestUrl: ' + requestUrl)
+	
+	request.get({url:requestUrl, oauth:oauth, json:true}, function(error, response, body) {
+		if (!error && response.statusCode == 200) {
+			res.send(body)
+		}
+		if (error) {
+			console.error()
+			console.log('Error: ' + error)
+			console.log('Status code: ' + response.statusCode)
+			res.send(response.statusCode)
+		}
+	})
+});
 
 /* GET foursquare request. */
 router.get('/places/foursquare', function(req, res, next) {
