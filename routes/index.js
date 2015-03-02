@@ -119,5 +119,15 @@ router.get('/places/instagram', function(req, res, next) {
 	})
 });
 
+/* GET instagram media for lat/lng */
+router.get('media/instagram', function(req, res, next) {
+	var oauth = {
+		client_id: 'c40df6cf23aa448c9c2da9007284f8e6',
+		client_secret: '8f83ed86028a498185a05bb4277fe601'
+	}
+	
+	var url = 'https://api.instagram.com/locations/'
+});
+
 
 module.exports = router;
