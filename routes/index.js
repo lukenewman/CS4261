@@ -47,14 +47,14 @@ router.get('/places', function(req, res, next) {
 	};
 
 	var requestUrl = createCompleteUrl(url, requestParams);
-	console.log('PLACES/ requestUrl: ' + requestUrl)
+	console.log('PLACES/ requestUrl: ' + requestUrl);
 
 	request.get({url:requestUrl, oauth:oauth, json:true},function (error, response, body) {
 		if (!error && response.statusCode == 200) {
 			res.send(body);
 		}
 		if (error) {
-			console.log('Error: ' + error);
+			console.error('Error: ' + error);
 			console.log('Status Code: ' + response.statusCode);
 			res.send(response.statusCode);
 		}
@@ -66,39 +66,38 @@ router.get('/media/instagram', function(req, res, next) {
 	var oauth = {
 		client_id: 'c40df6cf23aa448c9c2da9007284f8e6',
 		client_secret: '8f83ed86028a498185a05bb4277fe601'
-	}
+	};
 
-	var url = 'https://api.instagram.com/v1/locations/search'
+	var url = 'https://api.instagram.com/v1/locations/search';
 
 	var requestParams = {
 		lat: req.query.loc.split(',')[0],
 		lng: req.query.loc.split(',')[1]
-	}
+	};
 
-	var requestUrl = createCompleteUrl(url, requestParams)
-	console.log('MEDIA/INSTAGRAM requestUrl: ' + requestUrl)
+	var requestUrl = createCompleteUrl(url, requestParams);
+	console.log('MEDIA/INSTAGRAM requestUrl: ' + requestUrl);
 
 	request.get({url:requestUrl, oauth:oauth, json:true}, function(error, response, body) {
 		if (!error && response.statusCode == 200) {
-			res.send(body)
+			res.send(body);
 		}
 		if (error) {
-			console.error()
-			console.log('Error: ' + error)
-			console.log('Status code: ' + response.statusCode)
-			res.send(response.statusCode)
+			console.error('Error: ' + error);
+			console.log('Status code: ' + response.statusCode);
+			res.send(response.statusCode);
 		}
-	})
+	});
 });
 
 /* GET instagram media for lat/lng */
-router.get('media/instagram2', function(req, res, next) {
+router.get('/media/instagram2', function(req, res, next) {
 	var oauth = {
 		client_id: 'c40df6cf23aa448c9c2da9007284f8e6',
 		client_secret: '8f83ed86028a498185a05bb4277fe601'
-	}
-	
-	var url = 'https://api.instagram.com/locations/'
+	};
+
+	var url = 'https://api.instagram.com/locations/';
 });
 
 /* GET twitter data */
@@ -118,14 +117,14 @@ router.get('/media/twitter', function(req, res, next) {
   };
 
   var requestUrl = createCompleteUrl(url, requestParams);
-	console.log('MEDIA/TWITTER requestUrl: ' + requestUrl)
+	console.log('MEDIA/TWITTER requestUrl: ' + requestUrl);
 
   request.get({url:requestUrl, oauth:oauth, json:true},function (error, response, body) {
     if (!error && response.statusCode == 200) {
       res.send(body);
     }
     if (error) {
-      console.log('Error: ' + error);
+      console.error('Error: ' + error);
       console.log('Status Code: ' + response.statusCode);
       res.send(response.statusCode);
     }
@@ -153,7 +152,7 @@ router.get('/places/foursquare', function(req, res, next) {
       res.send(body);
     }
     if (error) {
-      console.log('Error: ' + error);
+      console.error('Error: ' + error);
       console.log('Status Code: ' + response.statusCode);
       res.send(response.statusCode);
     }
