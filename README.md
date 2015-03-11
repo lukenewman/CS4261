@@ -32,7 +32,27 @@ For all I have seen, the results are much better using Yelp (more business) in M
 
 ## Media Contents
 
-**TODO:**
+### Twitter
 
-- call Twitter API & integrate the results in the response from '/places' ?
-- call Instagram API & integrate the results in the response from '/places' ?
+Twitter requests can be tested on the following endpoint: '/media/twitter'
+It requires two parameters:
+
+- q : the query, a string you want to find in the tweets, for example, the name of the place
+- loc (**REQUIRED**): location you look for, in the format 'longitude,latitude', for example loc=49.0,6.10
+
+### Instagram
+
+...
+
+### Mixed response
+
+You can place a request on the endpoint '/medias' and it will respond with a JSONArray filled with both tweets and instagram posts, ordered by date (the most recent will be at the beginning of the list).
+
+It requires two parameters:
+
+- q : the query, a string you want to find in the tweets, for example, the name of the place
+- loc (**REQUIRED**): location you look for, in the format 'longitude,latitude', for example loc=49.0,6.10
+
+For example, you can try on your browser:
+
+	https://agile-tor-1071.herokuapp.com/medias?q=&loc=49.0,6.10
