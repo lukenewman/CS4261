@@ -69,10 +69,6 @@ router.get('/medias', function(req, res, next) {
 	var instagramId = 0;
 	var instagramMedias = [];
 
-	var instagramOauth = {
-		client_id: 'c40df6cf23aa448c9c2da9007284f8e6',
-		client_secret: '8f83ed86028a498185a05bb4277fe601'
-	};
 	var twitterOauth = {
 		consumer_key: '7IYF9oKnPLDEta86RqtyehHVG',
 		consumer_secret: 'a7WnvHk0fOlRSEuvGVgcIvO9gsiYgRNZWb0wrQgkL9RQAUaKpz',
@@ -100,9 +96,9 @@ router.get('/medias', function(req, res, next) {
 					console.error('Error: ' + error);
 					console.log('Status Code: ' + response.statusCode);
 				}
-				console.log("twitterMedia length: " + twitterMedias.length);
 				callback();
 			});
+
 		},
 		//Make a request to the Instagram API
 		function(callback) {
@@ -110,51 +106,51 @@ router.get('/medias', function(req, res, next) {
 				//Get the instagram ID of the place
 				function(callback) {
 					console.log("Entered Instagram ID task");
-					// var url = 'https://api.instagram.com/v1/locations/search';
-					//
-					// var requestParams = {
-					// 	lat: req.query.loc.split(',')[0],
-					// 	lng: req.query.loc.split(',')[1]
-					// };
-					//
-					// var requestUrl = createCompleteUrl(url, requestParams);
-					// console.log('MEDIA/INSTAGRAM_ID requestUrl: ' + requestUrl);
-					//
-					// request.get({url:requestUrl, oauth:instagramOauth, json:true}, function(error, response, body) {
-					// 	if (!error && response.statusCode == 200) {
-					// 		//TODO CORRECT ACCORDING TO THE FORMAT OF BODY
-					// 		instagramId = body;
-					// 		console.log(body);
-					// 	} else {
-					// 		console.error('Error: ' + error);
-					// 		console.log('Status code: ' + response.statusCode);
-					// 	}
-					// 	callback();
-					// });
-					callback();
+					var url = 'https://api.instagram.com/v1/locations/search';
+
+					var requestParams = {
+						lat: req.query.loc.split(',')[0],
+						lng: req.query.loc.split(',')[1],
+						client_id: 'c40df6cf23aa448c9c2da9007284f8e6'
+					};
+
+					var requestUrl = createCompleteUrl(url, requestParams);
+					console.log('MEDIA/INSTAGRAM_ID requestUrl: ' + requestUrl);
+
+					request.get(requestUrl, function(error, response, body) {
+						if (!error && response.statusCode == 200) {
+							body = JSON.parse(body);
+							instagramId = body.data[0].id;
+							console.log(instagramId);
+						} else {
+							console.error('Error: ' + error);
+							console.log('Status code: ' + response.statusCode);
+						}
+						callback();
+					});
 				},
 				//Get the instagram posts of the place
 				function(callback) {
 					console.log("Entered Instagram media task");
-					// //TODO FAKE REQUEST: to be completed
-					// var url = 'https://api.instagram.com/locations/';
-					// var requestParams = {
-					// };
-					//
-					// var requestUrl = createCompleteUrl(url, requestParams);
-					// console.log('MEDIA/INSTAGRAM requestUrl: ' + requestUrl);
-					//
-					// request.get({url:requestUrl, oauth:instagramOauth, json:true}, function(error, response, body) {
-					// 	if (!error && response.statusCode == 200) {
-					// 		//TODO CORRECT ACCORDING TO THE FORMAT OF BODY
-					// 		instagramMedias = body;
-					// 	} else {
-					// 		console.error('Error: ' + error);
-					// 		console.log('Status code: ' + response.statusCode);
-					// 	}
-					// 	callback();
-					// });
-					callback();
+					//TODO WRONG REQUEST: to be corrected
+					var url = 'https://api.instagram.com/locations/' + instagramId + '/media/recent';
+					var requestParams = {
+						client_id: 'c40df6cf23aa448c9c2da9007284f8e6'
+					};
+
+					var requestUrl = createCompleteUrl(url, requestParams);
+					console.log('MEDIA/INSTAGRAM requestUrl: ' + requestUrl);
+
+					request.get(requestUrl, function(error, response, body) {
+						if (!error && response.statusCode == 200) {
+							console.log(body);
+							instagramMedias = body.data;
+						} else {
+							console.error('Error: ' + error);
+							console.log('Status code: ' + response.statusCode);
+						}
+						callback();
+					});
 				}
 			], callback); //Remember to put in the second series task's "task callback" as the "final callback" for the async.parallel operation
 		}
@@ -166,13 +162,14 @@ router.get('/medias', function(req, res, next) {
 		for (var i = 0; i<twitterMedias.length; i++) {
 			// Replace the string created_at by a date object containing the same info
 			twitterMedias[i].created_at = new Date(Date.parse(twitterMedias[i].created_at));
+			twitterMedias[i].type = "Twitter";
 		}
 
 		// Preprocess instagramMedias entries
 		for (var j = 0; j<instagramMedias.length; j++) {
-			//TODO CORRECT ACCORDING TO THE FORMAT OF instagramMedias
 			// Replace the string created_at by a date object containing the same info
-			instagramMedias[j].created_at = new Date(Date.parse(instagramMedias[j].created_at));
+			instagramMedias[j].created_at = new Date(instagramMedias[j].created_time*1000);
+			instagramMedias[j].type = "Instagram";
 		}
 
 		//Copy all the medias into twitterMedias (to avoid creating a new array)
@@ -206,7 +203,8 @@ router.get('/media/instagram', function(req, res, next) {
 
 	var requestParams = {
 		lat: req.query.loc.split(',')[0],
-		lng: req.query.loc.split(',')[1]
+		lng: req.query.loc.split(',')[1],
+		client_id: 'c40df6cf23aa448c9c2da9007284f8e6'
 	};
 
 	var requestUrl = createCompleteUrl(url, requestParams);
