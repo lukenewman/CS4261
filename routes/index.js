@@ -162,14 +162,14 @@ router.get('/medias', function(req, res, next) {
 		for (var i = 0; i<twitterMedias.length; i++) {
 			// Replace the string created_at by a date object containing the same info
 			twitterMedias[i].created_at = new Date(Date.parse(twitterMedias[i].created_at));
-			twitterMedias[i].type = "Twitter";
+			twitterMedias[i].mediaType = "Twitter";
 		}
 
 		// Preprocess instagramMedias entries
 		for (var j = 0; j<instagramMedias.length; j++) {
 			// Replace the string created_at by a date object containing the same info
 			instagramMedias[j].created_at = new Date(instagramMedias[j].created_time*1000);
-			instagramMedias[j].type = "Instagram";
+			instagramMedias[j].mediaType = "Instagram";
 		}
 
 		//Copy all the medias into twitterMedias (to avoid creating a new array)
