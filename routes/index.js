@@ -66,7 +66,7 @@ router.get('/places', function(req, res, next) {
 router.get('/medias', function(req, res, next) {
 
 	var twitterMedias = [];
-	var instagramId = 0;
+	var instagramId;
 	var instagramMedias = [];
 
 	var twitterOauth = {
@@ -79,7 +79,7 @@ router.get('/medias', function(req, res, next) {
 	async.parallel([
 		//Make a request to the Twitter API
 		function(callback) {
-			console.log("Entered Twitter media task");
+			console.log("Started Twitter media task");
 			var url = 'https://api.twitter.com/1.1/search/tweets.json';
 			var requestParams = {
 				q: req.query.q,
@@ -105,7 +105,7 @@ router.get('/medias', function(req, res, next) {
 			async.series([
 				//Get the instagram ID of the place
 				function(callback) {
-					console.log("Entered Instagram ID task");
+					console.log("Started Instagram ID task");
 					var url = 'https://api.instagram.com/v1/locations/search';
 
 					var requestParams = {
@@ -120,8 +120,9 @@ router.get('/medias', function(req, res, next) {
 					request.get(requestUrl, function(error, response, body) {
 						if (!error && response.statusCode == 200) {
 							body = JSON.parse(body);
-							instagramId = body.data[0].id;
-							console.log(instagramId);
+							if (body.data.length !== 0) {
+								instagramId = body.data[0].id;
+							}
 						} else {
 							console.error('Error: ' + error);
 							console.log('Status code: ' + response.statusCode);
@@ -131,9 +132,16 @@ router.get('/medias', function(req, res, next) {
 				},
 				//Get the instagram posts of the place
 				function(callback) {
-					console.log("Entered Instagram media task");
+					console.log("Started Instagram media task");
 					//TODO WRONG REQUEST: to be corrected
-					var url = 'https://api.instagram.com/locations/' + instagramId + '/media/recent';
+					console.log("instagramId is " + instagramId);
+					var url;
+					if (instagramId !== undefined) {
+						url = 'https://api.instagram.com/locations/' + instagramId + '/media/recent';
+					} else {
+						callback();
+						return;
+					}
 					var requestParams = {
 						client_id: 'c40df6cf23aa448c9c2da9007284f8e6'
 					};
@@ -213,7 +221,7 @@ router.get('/media/instagram', function(req, res, next) {
 	var requestUrl = createCompleteUrl(url, requestParams);
 	console.log('MEDIA/INSTAGRAM requestUrl: ' + requestUrl);
 
-	request.get({url:requestUrl, oauth:oauth, json:true}, function(error, response, body) {
+	request.get(requestUrl, function(error, response, body) {
 		if (!error && response.statusCode == 200) {
 			res.send(body);
 		}
