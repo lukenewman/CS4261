@@ -187,7 +187,10 @@ router.get('/medias', function(req, res, next) {
 			return 0;
 		});
 
-		res.send(twitterMedias);
+		medias = {
+			medias: twitterMedias
+		};
+		res.send(medias);
 	});
 });
 
