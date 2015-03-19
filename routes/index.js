@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var request = require('request');
+var async = require('async');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -47,60 +48,199 @@ router.get('/places', function(req, res, next) {
 	};
 
 	var requestUrl = createCompleteUrl(url, requestParams);
-	console.log('PLACES/ requestUrl: ' + requestUrl)
+	console.log('PLACES/ requestUrl: ' + requestUrl);
 
 	request.get({url:requestUrl, oauth:oauth, json:true},function (error, response, body) {
 		if (!error && response.statusCode == 200) {
 			res.send(body);
 		}
 		if (error) {
-			console.log('Error: ' + error);
+			console.error('Error: ' + error);
 			console.log('Status Code: ' + response.statusCode);
-			res.send(response.statusCode);
+			res.sendStatus(response.statusCode);
 		}
 	});
 });
+
+/*GET medias*/
+router.get('/medias', function(req, res, next) {
+
+	var twitterMedias = [];
+	var instagramId;
+	var instagramMedias = [];
+
+	var twitterOauth = {
+		consumer_key: '7IYF9oKnPLDEta86RqtyehHVG',
+		consumer_secret: 'a7WnvHk0fOlRSEuvGVgcIvO9gsiYgRNZWb0wrQgkL9RQAUaKpz',
+		token: '3059932155-cle3iD7vkXjnd7bHHTPBMQrgVDv7YoFIxR2xx3t',
+		token_secret: 'TkdySo3XL17tIi1jBcYwpOhsLPMgiyBE5BAjXUtu3xfQd'
+	};
+
+	async.parallel([
+		//Make a request to the Twitter API
+		function(callback) {
+			console.log("Started Twitter media task");
+			var url = 'https://api.twitter.com/1.1/search/tweets.json';
+			var requestParams = {
+				q: req.query.q,
+				geocode: req.query.loc + ',1km'
+			};
+
+			var requestUrl = createCompleteUrl(url, requestParams);
+			console.log('MEDIA/TWITTER requestUrl: ' + requestUrl);
+
+			request.get({url:requestUrl, oauth:twitterOauth, json:true},function (error, response, body) {
+				if (!error && response.statusCode == 200) {
+					twitterMedias = body.statuses;
+				} else {
+					console.error('Error: ' + error);
+					console.log('Status Code: ' + response.statusCode);
+				}
+				callback();
+			});
+
+		},
+		//Make a request to the Instagram API
+		function(callback) {
+			async.series([
+				//Get the instagram ID of the place
+				function(callback) {
+					console.log("Started Instagram ID task");
+					var url = 'https://api.instagram.com/v1/locations/search';
+
+					var requestParams = {
+						lat: req.query.loc.split(',')[0],
+						lng: req.query.loc.split(',')[1],
+						client_id: 'c40df6cf23aa448c9c2da9007284f8e6'
+					};
+
+					var requestUrl = createCompleteUrl(url, requestParams);
+					console.log('MEDIA/INSTAGRAM_ID requestUrl: ' + requestUrl);
+
+					request.get(requestUrl, function(error, response, body) {
+						if (!error && response.statusCode == 200) {
+							body = JSON.parse(body);
+							if (body.data.length !== 0) {
+								instagramId = body.data[0].id;
+							}
+						} else {
+							console.error('Error: ' + error);
+							console.log('Status code: ' + response.statusCode);
+						}
+						callback();
+					});
+				},
+				//Get the instagram posts of the place
+				function(callback) {
+					console.log("Started Instagram media task");
+					//TODO WRONG REQUEST: to be corrected
+					console.log("instagramId is " + instagramId);
+					var url;
+					if (instagramId !== undefined) {
+						url = 'https://api.instagram.com/locations/' + instagramId + '/media/recent';
+					} else {
+						callback();
+						return;
+					}
+					var requestParams = {
+						client_id: 'c40df6cf23aa448c9c2da9007284f8e6'
+					};
+
+					var requestUrl = createCompleteUrl(url, requestParams);
+					console.log('MEDIA/INSTAGRAM requestUrl: ' + requestUrl);
+
+					request.get(requestUrl, function(error, response, body) {
+						if (!error && response.statusCode == 200) {
+							console.log(body);
+							instagramMedias = body.data;
+						} else {
+							console.error('Error: ' + error);
+							console.log('Status code: ' + response.statusCode);
+						}
+						callback();
+					});
+				}
+			], callback); //Remember to put in the second series task's "task callback" as the "final callback" for the async.parallel operation
+		}
+	], function(err) {
+		//This function gets called after the two parallel tasks have called their "task callbacks"
+		if (err) return console.error(err);
+
+		// Preprocess twitterMedias entries
+		for (var i = 0; i<twitterMedias.length; i++) {
+			// Replace the string created_at by a date object containing the same info
+			twitterMedias[i].created_at = new Date(Date.parse(twitterMedias[i].created_at));
+			twitterMedias[i].mediaType = "Twitter";
+		}
+
+		// Preprocess instagramMedias entries
+		for (var j = 0; j<instagramMedias.length; j++) {
+			// Replace the string created_at by a date object containing the same info
+			instagramMedias[j].created_at = new Date(instagramMedias[j].created_time*1000);
+			instagramMedias[j].mediaType = "Instagram";
+		}
+
+		//Copy all the medias into twitterMedias (to avoid creating a new array)
+		twitterMedias.push.apply(twitterMedias,instagramMedias);
+		twitterMedias.sort(function(a,b) {
+			dateA = a.created_at;
+			dateB = b.created_at;
+
+			if (dateA < dateB) {
+				return 1;
+			}
+			if (dateA > dateB) {
+				return -1;
+			}
+			return 0;
+		});
+
+		medias = {
+			medias: twitterMedias
+		};
+		res.send(medias);
+	});
+});
+
 
 /* GET instagram place id */
 router.get('/media/instagram', function(req, res, next) {
 	var oauth = {
 		client_id: 'c40df6cf23aa448c9c2da9007284f8e6',
 		client_secret: '8f83ed86028a498185a05bb4277fe601'
-	}
+	};
 
-	var url = 'https://api.instagram.com/v1/locations/search'
+	var url = 'https://api.instagram.com/v1/locations/search';
 
 	var requestParams = {
-		lat: req.query.lat,
-		lng: req.query.lng,
+		lat: req.query.loc.split(',')[0],
+		lng: req.query.loc.split(',')[1],
 		client_id: 'c40df6cf23aa448c9c2da9007284f8e6'
-	}
+	};
 
-	var requestUrl = createCompleteUrl(url, requestParams)
-	console.log('MEDIA/INSTAGRAM requestUrl: ' + requestUrl)
+	var requestUrl = createCompleteUrl(url, requestParams);
+	console.log('MEDIA/INSTAGRAM requestUrl: ' + requestUrl);
 
-	request.get({url:requestUrl, json:true}, function(error, response, body) {
+	request.get(requestUrl, function(error, response, body) {
 		if (!error && response.statusCode == 200) {
-			console.log('Good Status code');
-			res.send(body)
+			res.send(body);
 		}
 		if (error) {
-			console.error()
-			console.log('Error: ' + error)
-			console.log('Status code: ' + response.statusCode)
-			res.send(response.statusCode)
+			console.error('Error: ' + error);
+			console.log('Status code: ' + response.statusCode);
+			res.sendStatus(response.statusCode);
 		}
-	})
+	});
 });
 
 /* GET instagram media for lat/lng */
-router.get('media/instagram2', function(req, res, next) {
+router.get('/media/instagram2', function(req, res, next) {
 	var oauth = {
 		client_id: 'c40df6cf23aa448c9c2da9007284f8e6',
 		client_secret: '8f83ed86028a498185a05bb4277fe601'
-	}
-	
-	var url = 'https://api.instagram.com/locations/'
+	};
+
+	var url = 'https://api.instagram.com/locations/';
 });
 
 /* GET twitter data */
@@ -124,12 +264,12 @@ router.get('/media/twitter', function(req, res, next) {
 
 	request.get({url:requestUrl, oauth:oauth, json:true},function (error, response, body) {
 		if (!error && response.statusCode == 200) {
-			res.send(body);
+			res.send(body.statuses);
 		}
 		if (error) {
-			console.log('Error: ' + error);
+			console.error('Error: ' + error);
 			console.log('Status Code: ' + response.statusCode);
-			res.send(response.statusCode);
+			res.sendStatus(response.statusCode);
 		}
 	});
 });
@@ -144,7 +284,7 @@ router.get('/places/foursquare', function(req, res, next) {
 		ll: req.query.loc, // example: '49.0,6.10'
 		radius: req.query.radius, //example '1000'
 		section: req.query.section,  //example 'food'
-		limit: req.query.limit
+		limit: 20
 	};
 
 	var requestUrl = createCompleteUrl(url,requestParams);
@@ -155,9 +295,9 @@ router.get('/places/foursquare', function(req, res, next) {
 			res.send(body);
 		}
 		if (error) {
-			console.log('Error: ' + error);
+			console.error('Error: ' + error);
 			console.log('Status Code: ' + response.statusCode);
-			res.send(response.statusCode);
+			res.sendStatus(response.statusCode);
 		}
 	});
 
