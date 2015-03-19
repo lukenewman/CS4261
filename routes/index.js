@@ -52,6 +52,13 @@ router.get('/places', function(req, res, next) {
 
 	request.get({url:requestUrl, oauth:oauth, json:true},function (error, response, body) {
 		if (!error && response.statusCode == 200) {
+			
+			// TODO make sure this moves the coordinate information into the lowest level of the business JSON
+			// (this makes it easier for iOS object mapping)
+			// for (var i = 0; i < body.businesses.length; i++) {
+			// 	body.businesses[i].lat = body.businesses[i].coordinate.latitude;
+			// 	body.businesses[i].lng = body.businesses[i].coordinate.latitude;
+			// }
 			res.send(body);
 		}
 		if (error) {
@@ -137,7 +144,7 @@ router.get('/medias', function(req, res, next) {
 					console.log("instagramId is " + instagramId);
 					var url;
 					if (instagramId !== undefined) {
-						url = 'https://api.instagram.com/locations/' + instagramId + '/media/recent';
+						url = 'https://api.instagram.com/v1/locations/' + instagramId + '/media/recent';
 					} else {
 						callback();
 						return;
@@ -233,14 +240,33 @@ router.get('/media/instagram', function(req, res, next) {
 	});
 });
 
-/* GET instagram media for lat/lng */
+/* GET instagram media for place id */
 router.get('/media/instagram2', function(req, res, next) {
 	var oauth = {
 		client_id: 'c40df6cf23aa448c9c2da9007284f8e6',
 		client_secret: '8f83ed86028a498185a05bb4277fe601'
 	};
 
-	var url = 'https://api.instagram.com/locations/';
+	// https://api.instagram.com/v1/locations/271364243/media/recent?client_id=...
+	var url = 'https://api.instagram.com/v1/locations/' + req.query.id + 'media/recent';
+	
+	var requestParams = {
+		client_id: 'c40df6cf23aa448c9c2da9007284f8e6'
+	}
+	
+	var requestUrl = createCompleteUrl(url, requestParams);
+	console.log('/MEDIA/INSTAGRAM2 requestUrl: ' + requestUrl);
+	
+	request.get(requestUrl, function(error, response, body) {
+		if (!error && response.statusCode == 200) {
+			res.send(body);
+		}
+		if (error) {
+			console.error('Error: ' + error);
+			console.log('Status code: ' + response.statusCode);
+			res.sendStatus(response.statusCode);
+		}
+	});
 });
 
 /* GET twitter data */
@@ -300,7 +326,6 @@ router.get('/places/foursquare', function(req, res, next) {
 			res.sendStatus(response.statusCode);
 		}
 	});
-
 });
 
 module.exports = router;
