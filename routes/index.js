@@ -137,7 +137,7 @@ router.get('/medias', function(req, res, next) {
 					console.log("instagramId is " + instagramId);
 					var url;
 					if (instagramId !== undefined) {
-						url = 'https://api.instagram.com/locations/' + instagramId + '/media/recent';
+						url = 'https://api.instagram.com/v1/locations/' + instagramId + '/media/recent';
 					} else {
 						callback();
 						return;
@@ -151,7 +151,7 @@ router.get('/medias', function(req, res, next) {
 
 					request.get(requestUrl, function(error, response, body) {
 						if (!error && response.statusCode == 200) {
-							console.log(body);
+							body = JSON.parse(body);
 							instagramMedias = body.data;
 						} else {
 							console.error('Error: ' + error);
