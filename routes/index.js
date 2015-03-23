@@ -2,11 +2,23 @@ var express = require('express');
 var router = express.Router();
 var request = require('request');
 var async = require('async');
+var mongojs = require('mongojs');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
 	res.render('index', { title: 'Express' });
 });
+
+var db = mongojs('mongolab_user:CS4261_user@ds031561.mongolab.com:31561/heroku_app33937405');
+var featured = db.collection('featured');
+
+if (db !== undefined) {
+	console.log("db connection OK");
+}
+
+if (featured !== undefined) {
+	console.log("featured collection OK");
+}
 
 function createCompleteUrl(url, requestParams) {
 	var requestUrl = url;
@@ -29,44 +41,73 @@ function createCompleteUrl(url, requestParams) {
 /* GET yelp data */
 router.get('/places', function(req, res, next) {
 
-	var oauth = {
-		consumer_key: 'ITZtXcKc38ITLI_nLh8ogg',
-		consumer_secret: 'V2UPsiirFcVE0EziN8D7k3894qo',
-		token: 'B_BSlUYZ7em3w9d7FBZqZHmzfciE8qpD',
-		token_secret: '1imyzTp9XdNRnLtLsZXSLXH552M'
-	};
+	async.parallel([
+		/*Request to Yelp API*/
+		function(callback){
+			var oauth = {
+				consumer_key: 'ITZtXcKc38ITLI_nLh8ogg',
+				consumer_secret: 'V2UPsiirFcVE0EziN8D7k3894qo',
+				token: 'B_BSlUYZ7em3w9d7FBZqZHmzfciE8qpD',
+				token_secret: '1imyzTp9XdNRnLtLsZXSLXH552M'
+			};
+			var url = 'http://api.yelp.com/v2/search';
+			var requestParams = {
+				ll: req.query.loc, // example: '49.0,6.10'
+				radius_filter: req.query.radius, //example '1000'
+				category_filter: req.query.section, // example 'restaurants'
+				// complete list: http://www.yelp.com/
+				// developers/documentation/v2/all_category_list
+				sort: 2, // sort the business by Highest Rated
+				limit: 20 //total number of business
+			};
 
-	var url = 'http://api.yelp.com/v2/search';
-	var requestParams = {
-		ll: req.query.loc, // example: '49.0,6.10'
-		radius_filter: req.query.radius, //example '1000'
-		category_filter: req.query.section, // example 'restaurants'
-		// complete list: http://www.yelp.com/
-		// developers/documentation/v2/all_category_list
-		sort: 2, // sort the business by Highest Rated
-		limit: 20 //total number of business
-	};
+			var requestUrl = createCompleteUrl(url, requestParams);
+			console.log('PLACES/ requestUrl: ' + requestUrl);
 
-	var requestUrl = createCompleteUrl(url, requestParams);
-	console.log('PLACES/ requestUrl: ' + requestUrl);
-
-	request.get({url:requestUrl, oauth:oauth, json:true},function (error, response, body) {
-		if (!error && response.statusCode == 200) {
-			
-			// TODO make sure this moves the coordinate information into the lowest level of the business JSON
-			// (this makes it easier for iOS object mapping)
-			// for (var i = 0; i < body.businesses.length; i++) {
-			// 	body.businesses[i].lat = body.businesses[i].coordinate.latitude;
-			// 	body.businesses[i].lng = body.businesses[i].coordinate.latitude;
-			// }
-			res.send(body);
+			request.get({url:requestUrl, oauth:oauth, json:true},function (error, response, body) {
+				if (!error && response.statusCode == 200) {
+					res.send(body);
+				}
+				if (error) {
+					console.error('Error: ' + error);
+					console.log('Status Code: ' + response.statusCode);
+					res.sendStatus(response.statusCode);
+				}
+				callback();
+			});
+		},
+		/*Call to MongoDB to get the list of close featured places*/
+		function(callback){
+			var radius;
+			if (req.query.radius !== undefined) {
+				radius = req.query.radius;
+			} else {
+				radius = 1000;
+			}
+			featured.find({
+				loc: {
+					$near: {
+						$geometry: {
+							type: "Point" ,
+							coordinates: [ Number(req.query.loc.split(',')[1]), Number(req.query.loc.split(',')[0])]
+						},
+						$maxDistance: radius
+					}
+				}
+			}, function(err,docs) {
+				if (err !== null) {
+					console.log(err);
+				} else {
+					for (var i = 0; i < docs.length; i++) {
+						console.log(docs[i]);
+					}
+				}
+			});
 		}
-		if (error) {
-			console.error('Error: ' + error);
-			console.log('Status Code: ' + response.statusCode);
-			res.sendStatus(response.statusCode);
-		}
+	], function(err) {
+
 	});
+
 });
 
 /*GET medias*/
@@ -158,7 +199,7 @@ router.get('/medias', function(req, res, next) {
 
 					request.get(requestUrl, function(error, response, body) {
 						if (!error && response.statusCode == 200) {
-							console.log(body);
+							body = JSON.parse(body);
 							instagramMedias = body.data;
 						} else {
 							console.error('Error: ' + error);
