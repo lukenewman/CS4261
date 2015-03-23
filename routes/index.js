@@ -265,26 +265,43 @@ router.get('/medias', function(req, res, next) {
 		if (err) return console.error(err);
 
 		var medias = {
-			medias: []
+			data: []
 		};
 
 		// Preprocess twitterMedias entries
 		for (var i = 0; i<twitterMedias.length; i++) {
 			// Replace the string created_at by a date object containing the same info
-			twitterMedias[i].created_at = new Date(Date.parse(twitterMedias[i].created_at));
-			twitterMedias[i].mediaType = "Twitter";
+			// twitterMedias[i].created_at = new Date(Date.parse(twitterMedias[i].created_at));
+			// twitterMedias[i].mediaType = "Twitter";
+			medias.data[i] = {};
+			medias.data[i].created_at = new Date(Date.parse(twitterMedias[i].created_at));
+			medias.data[i].mediaType = "Twitter";
+			medias.data[i].text = twitterMedias[i].text;
+			medias.data[i].username = twitterMedias[i].user.screen_name;
+			medias.data[i].profile_image = twitterMedias[i].user.profile_image_url;
 		}
 
+		var offset = twitterMedias.length;
 		// Preprocess instagramMedias entries
 		for (var j = 0; j<instagramMedias.length; j++) {
 			// Replace the string created_at by a date object containing the same info
-			instagramMedias[j].created_at = new Date(instagramMedias[j].created_time*1000);
-			instagramMedias[j].mediaType = "Instagram";
+			// instagramMedias[j].created_at = new Date(instagramMedias[j].created_time*1000);
+			// instagramMedias[j].mediaType = "Instagram";
+			medias.data[j+offset] = {};
+			medias.data[j+offset].created_at = new Date(instagramMedias[j].created_time*1000);
+			medias.data[j+offset].mediaType = "Instagram";
+			medias.data[j+offset].image_url =  instagramMedias[j].images.standard_resolution.url;
+			medias.data[j+offset].image_url =  instagramMedias[j].images.standard_resolution.url;
+			medias.data[j+offset].username = instagramMedias[j].user.username;
+			medias.data[j+offset].caption = (instagramMedias[j].caption!==null)?instagramMedias[j].caption.text:"";
+			medias.data[j+offset].type = instagramMedias[j].type;
+			medias.data[j+offset].width = instagramMedias[j].images.standard_resolution.width;
+			medias.data[j+offset].height = instagramMedias[j].images.standard_resolution.height;
 		}
 
 		//Copy all the medias into twitterMedias (to avoid creating a new array)
-		twitterMedias.push.apply(twitterMedias,instagramMedias);
-		twitterMedias.sort(function(a,b) {
+		//twitterMedias.push.apply(twitterMedias,instagramMedias);
+		medias.data.sort(function(a,b) {
 			dateA = a.created_at;
 			dateB = b.created_at;
 
