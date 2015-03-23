@@ -136,6 +136,7 @@ router.get('/places', function(req, res, next) {
 			places.businesses[j].image_url = yelpPlaces[j].image_url;
 			places.businesses[j].is_closed = yelpPlaces[j].is_closed;
 			places.businesses[j].distance = yelpPlaces[j].distance;
+			places.businesses[j].rating = yelpPlaces[j].rating;
 			places.businesses[j].address = yelpPlaces[j].location.display_address;
 
 			if (featuredPlaces.length !== 0) {
@@ -293,6 +294,7 @@ router.get('/medias', function(req, res, next) {
 			medias.data[j+offset].image_url =  instagramMedias[j].images.standard_resolution.url;
 			medias.data[j+offset].image_url =  instagramMedias[j].images.standard_resolution.url;
 			medias.data[j+offset].username = instagramMedias[j].user.username;
+			medias.data[j+offset].profile_image = instagramMedias[j].user.profile_picture;
 			medias.data[j+offset].caption = (instagramMedias[j].caption!==null)?instagramMedias[j].caption.text:"";
 			medias.data[j+offset].type = instagramMedias[j].type;
 			medias.data[j+offset].width = instagramMedias[j].images.standard_resolution.width;
