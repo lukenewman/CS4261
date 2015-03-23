@@ -51,6 +51,13 @@ router.get('/places', function(req, res, next) {
 		radius = 2000;
 	}
 
+	var section;
+	if (req.query.section !== undefined) {
+		section = req.query.section;
+	} else {
+		section = "";
+	}
+
 	async.parallel([
 		/*Request to Yelp API*/
 		function(callback){
@@ -113,25 +120,41 @@ router.get('/places', function(req, res, next) {
 	],
 	function(err) {
 		console.log("featuredPlaces length: " + featuredPlaces.length);
-		if (featuredPlaces.length !== 0) {
-			for (var i = 0; i < featuredPlaces.length; i++) {
-				for (var j = 0; j < yelpPlaces.length; j++) {
+
+		var places = {
+			category: section,
+			businesses: []
+		};
+
+		for (var j = 0; j < yelpPlaces.length; j++) {
+			places.businesses[j] = {};
+			places.businesses[j].id = yelpPlaces[j].id;
+			places.businesses[j].name = yelpPlaces[j].name;
+			places.businesses[j].latitude = yelpPlaces[j].location.coordinate.latitude;
+			places.businesses[j].longitude = yelpPlaces[j].location.coordinate.longitude;
+			places.businesses[j].phone_number = yelpPlaces[j].phone;
+			places.businesses[j].image_url = yelpPlaces[j].image_url;
+			places.businesses[j].is_closed = yelpPlaces[j].is_closed;
+			places.businesses[j].distance = yelpPlaces[j].distance;
+			places.businesses[j].address = yelpPlaces[j].location.display_address;
+
+			if (featuredPlaces.length !== 0) {
+				for (var i = 0; i < featuredPlaces.length; i++) {
 					if (featuredPlaces[i]._id == yelpPlaces[j].id) {
-						yelpPlaces[j].featured_value = featuredPlaces[i].investment;
+						places.businesses[j].featured_value = featuredPlaces[i].investment;
 					} else {
-						yelpPlaces[j].featured_value = 0;
+						places.businesses[j].featured_value = 0;
 					}
 				}
-			}
-		} else {
-			for (var k = 0; k < yelpPlaces.length; k++) {
-				yelpPlaces[k].featured_value = 0;
+			} else {
+				places.businesses[j].featured_value = 0;
 			}
 		}
 
-		var places = {
-			businesses: yelpPlaces
-		};
+
+		// var places = {
+		// 	businesses: yelpPlaces
+		// };
 		res.send(places);
 	});
 
@@ -241,6 +264,10 @@ router.get('/medias', function(req, res, next) {
 		//This function gets called after the two parallel tasks have called their "task callbacks"
 		if (err) return console.error(err);
 
+		var medias = {
+			medias: []
+		};
+
 		// Preprocess twitterMedias entries
 		for (var i = 0; i<twitterMedias.length; i++) {
 			// Replace the string created_at by a date object containing the same info
@@ -270,9 +297,9 @@ router.get('/medias', function(req, res, next) {
 			return 0;
 		});
 
-		medias = {
-			medias: twitterMedias
-		};
+		// medias = {
+		// 	medias: twitterMedias
+		// };
 		res.send(medias);
 	});
 });
