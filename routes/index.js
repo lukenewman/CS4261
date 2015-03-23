@@ -132,9 +132,9 @@ router.get('/places', function(req, res, next) {
 			places.businesses[j].name = yelpPlaces[j].name;
 			places.businesses[j].latitude = yelpPlaces[j].location.coordinate.latitude;
 			places.businesses[j].longitude = yelpPlaces[j].location.coordinate.longitude;
-			places.businesses[j].phone_number = yelpPlaces[j].phone;
-			places.businesses[j].image_url = yelpPlaces[j].image_url;
-			places.businesses[j].is_closed = yelpPlaces[j].is_closed;
+			places.businesses[j].phoneNumber = yelpPlaces[j].phone;
+			places.businesses[j].imageURL = (yelpPlaces[j].image_url !== undefined)?yelpPlaces[j].image_url:"";
+			places.businesses[j].isClosed = yelpPlaces[j].is_closed;
 			places.businesses[j].distance = yelpPlaces[j].distance;
 			places.businesses[j].rating = yelpPlaces[j].rating;
 			places.businesses[j].address = yelpPlaces[j].location.display_address;
@@ -142,13 +142,13 @@ router.get('/places', function(req, res, next) {
 			if (featuredPlaces.length !== 0) {
 				for (var i = 0; i < featuredPlaces.length; i++) {
 					if (featuredPlaces[i]._id == yelpPlaces[j].id) {
-						places.businesses[j].featured_value = featuredPlaces[i].investment;
+						places.businesses[j].featuredValue = featuredPlaces[i].investment;
 					} else {
-						places.businesses[j].featured_value = 0;
+						places.businesses[j].featuredValue = 0;
 					}
 				}
 			} else {
-				places.businesses[j].featured_value = 0;
+				places.businesses[j].featuredValue = 0;
 			}
 		}
 
@@ -275,11 +275,11 @@ router.get('/medias', function(req, res, next) {
 			// twitterMedias[i].created_at = new Date(Date.parse(twitterMedias[i].created_at));
 			// twitterMedias[i].mediaType = "Twitter";
 			medias.data[i] = {};
-			medias.data[i].created_at = new Date(Date.parse(twitterMedias[i].created_at));
+			medias.data[i].createdAt = new Date(Date.parse(twitterMedias[i].created_at));
 			medias.data[i].mediaType = "Twitter";
 			medias.data[i].text = twitterMedias[i].text;
 			medias.data[i].username = twitterMedias[i].user.screen_name;
-			medias.data[i].profile_image = twitterMedias[i].user.profile_image_url;
+			medias.data[i].profileImageURL = twitterMedias[i].user.profile_image_url;
 		}
 
 		var offset = twitterMedias.length;
@@ -289,12 +289,11 @@ router.get('/medias', function(req, res, next) {
 			// instagramMedias[j].created_at = new Date(instagramMedias[j].created_time*1000);
 			// instagramMedias[j].mediaType = "Instagram";
 			medias.data[j+offset] = {};
-			medias.data[j+offset].created_at = new Date(instagramMedias[j].created_time*1000);
+			medias.data[j+offset].createdAt = new Date(instagramMedias[j].created_time*1000);
 			medias.data[j+offset].mediaType = "Instagram";
-			medias.data[j+offset].image_url =  instagramMedias[j].images.standard_resolution.url;
-			medias.data[j+offset].image_url =  instagramMedias[j].images.standard_resolution.url;
+			medias.data[j+offset].imageURL =  instagramMedias[j].images.standard_resolution.url;
 			medias.data[j+offset].username = instagramMedias[j].user.username;
-			medias.data[j+offset].profile_image = instagramMedias[j].user.profile_picture;
+			medias.data[j+offset].profileImageURL = instagramMedias[j].user.profile_picture;
 			medias.data[j+offset].caption = (instagramMedias[j].caption!==null)?instagramMedias[j].caption.text:"";
 			medias.data[j+offset].type = instagramMedias[j].type;
 			medias.data[j+offset].width = instagramMedias[j].images.standard_resolution.width;
