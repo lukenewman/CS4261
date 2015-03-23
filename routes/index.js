@@ -40,6 +40,16 @@ function createCompleteUrl(url, requestParams) {
 
 /* GET yelp data */
 router.get('/places', function(req, res, next) {
+	var yelpPlaces = [];
+	var featuredPlaces = [];
+
+	var radius;
+
+	if (req.query.radius !== undefined) {
+		radius = req.query.radius;
+	} else {
+		radius = 2000;
+	}
 
 	async.parallel([
 		/*Request to Yelp API*/
@@ -53,12 +63,12 @@ router.get('/places', function(req, res, next) {
 			var url = 'http://api.yelp.com/v2/search';
 			var requestParams = {
 				ll: req.query.loc, // example: '49.0,6.10'
-				radius_filter: req.query.radius, //example '1000'
+				radius_filter: radius, //example '1000'
 				category_filter: req.query.section, // example 'restaurants'
 				// complete list: http://www.yelp.com/
 				// developers/documentation/v2/all_category_list
 				sort: 2, // sort the business by Highest Rated
-				limit: 20 //total number of business
+				//limit: 20 //total number of business
 			};
 
 			var requestUrl = createCompleteUrl(url, requestParams);
@@ -66,7 +76,7 @@ router.get('/places', function(req, res, next) {
 
 			request.get({url:requestUrl, oauth:oauth, json:true},function (error, response, body) {
 				if (!error && response.statusCode == 200) {
-					res.send(body);
+					yelpPlaces = body.businesses;
 				}
 				if (error) {
 					console.error('Error: ' + error);
@@ -76,14 +86,10 @@ router.get('/places', function(req, res, next) {
 				callback();
 			});
 		},
+
 		/*Call to MongoDB to get the list of close featured places*/
 		function(callback){
-			var radius;
-			if (req.query.radius !== undefined) {
-				radius = req.query.radius;
-			} else {
-				radius = 1000;
-			}
+
 			featured.find({
 				loc: {
 					$near: {
@@ -91,21 +97,42 @@ router.get('/places', function(req, res, next) {
 							type: "Point" ,
 							coordinates: [ Number(req.query.loc.split(',')[1]), Number(req.query.loc.split(',')[0])]
 						},
-						$maxDistance: radius
+						$maxDistance: Number(radius + 500)
 					}
 				}
 			}, function(err,docs) {
 				if (err !== null) {
 					console.log(err);
 				} else {
-					for (var i = 0; i < docs.length; i++) {
-						console.log(docs[i]);
-					}
+					featuredPlaces = docs;
 				}
+
+				callback();
 			});
 		}
-	], function(err) {
+	],
+	function(err) {
+		console.log("featuredPlaces length: " + featuredPlaces.length);
+		if (featuredPlaces.length !== 0) {
+			for (var i = 0; i < featuredPlaces.length; i++) {
+				for (var j = 0; j < yelpPlaces.length; j++) {
+					if (featuredPlaces[i]._id == yelpPlaces[j].id) {
+						yelpPlaces[j].featured_value = featuredPlaces[i].investment;
+					} else {
+						yelpPlaces[j].featured_value = 0;
+					}
+				}
+			}
+		} else {
+			for (var k = 0; k < yelpPlaces.length; k++) {
+				yelpPlaces[k].featured_value = 0;
+			}
+		}
 
+		var places = {
+			businesses: yelpPlaces
+		};
+		res.send(places);
 	});
 
 });
@@ -290,14 +317,14 @@ router.get('/media/instagram2', function(req, res, next) {
 
 	// https://api.instagram.com/v1/locations/271364243/media/recent?client_id=...
 	var url = 'https://api.instagram.com/v1/locations/' + req.query.id + 'media/recent';
-	
+
 	var requestParams = {
 		client_id: 'c40df6cf23aa448c9c2da9007284f8e6'
 	}
-	
+
 	var requestUrl = createCompleteUrl(url, requestParams);
 	console.log('/MEDIA/INSTAGRAM2 requestUrl: ' + requestUrl);
-	
+
 	request.get(requestUrl, function(error, response, body) {
 		if (!error && response.statusCode == 200) {
 			res.send(body);
