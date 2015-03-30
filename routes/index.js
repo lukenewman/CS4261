@@ -132,7 +132,7 @@ router.get('/places', function(req, res, next) {
 			places.businesses[j].name = yelpPlaces[j].name;
 			places.businesses[j].latitude = yelpPlaces[j].location.coordinate.latitude;
 			places.businesses[j].longitude = yelpPlaces[j].location.coordinate.longitude;
-			places.businesses[j].phoneNumber = yelpPlaces[j].phone;
+			places.businesses[j].phoneNumber = (yelpPlaces[j].phone !== undefined)?yelpPlaces[j].phone:"";
 			places.businesses[j].imageURL = (yelpPlaces[j].image_url !== undefined)?yelpPlaces[j].image_url:"";
 			places.businesses[j].isClosed = yelpPlaces[j].is_closed;
 			places.businesses[j].distance = yelpPlaces[j].distance;
@@ -152,10 +152,6 @@ router.get('/places', function(req, res, next) {
 			}
 		}
 
-
-		// var places = {
-		// 	businesses: yelpPlaces
-		// };
 		res.send(places);
 	});
 
@@ -232,7 +228,6 @@ router.get('/medias', function(req, res, next) {
 				//Get the instagram posts of the place
 				function(callback) {
 					console.log("Started Instagram media task");
-					//TODO WRONG REQUEST: to be corrected
 					console.log("instagramId is " + instagramId);
 					var url;
 					if (instagramId !== undefined) {
@@ -271,37 +266,31 @@ router.get('/medias', function(req, res, next) {
 
 		// Preprocess twitterMedias entries
 		for (var i = 0; i<twitterMedias.length; i++) {
-			// Replace the string created_at by a date object containing the same info
-			// twitterMedias[i].created_at = new Date(Date.parse(twitterMedias[i].created_at));
-			// twitterMedias[i].mediaType = "Twitter";
 			medias.data[i] = {};
+			// Replace the string created_at by a date object containing the same info
 			medias.data[i].createdAt = new Date(Date.parse(twitterMedias[i].created_at));
 			medias.data[i].mediaType = "Twitter";
 			medias.data[i].text = twitterMedias[i].text;
 			medias.data[i].username = twitterMedias[i].user.screen_name;
-			medias.data[i].profileImageURL = twitterMedias[i].user.profile_image_url;
+			medias.data[i].profileImageURL = (twitterMedias[i].user.profile_image_url!==null)?twitterMedias[i].user.profile_image_url:"";
 		}
 
 		var offset = twitterMedias.length;
 		// Preprocess instagramMedias entries
 		for (var j = 0; j<instagramMedias.length; j++) {
-			// Replace the string created_at by a date object containing the same info
-			// instagramMedias[j].created_at = new Date(instagramMedias[j].created_time*1000);
-			// instagramMedias[j].mediaType = "Instagram";
 			medias.data[j+offset] = {};
+			// Replace the string created_at by a date object containing the same info
 			medias.data[j+offset].createdAt = new Date(instagramMedias[j].created_time*1000);
 			medias.data[j+offset].mediaType = "Instagram";
 			medias.data[j+offset].imageURL =  instagramMedias[j].images.standard_resolution.url;
 			medias.data[j+offset].username = instagramMedias[j].user.username;
-			medias.data[j+offset].profileImageURL = instagramMedias[j].user.profile_picture;
+			medias.data[j+offset].profileImageURL = (instagramMedias[j].user.profile_picture!==null)?instagramMedias[j].user.profile_picture:"";
 			medias.data[j+offset].caption = (instagramMedias[j].caption!==null)?instagramMedias[j].caption.text:"";
 			medias.data[j+offset].type = instagramMedias[j].type;
 			medias.data[j+offset].width = instagramMedias[j].images.standard_resolution.width;
 			medias.data[j+offset].height = instagramMedias[j].images.standard_resolution.height;
 		}
 
-		//Copy all the medias into twitterMedias (to avoid creating a new array)
-		//twitterMedias.push.apply(twitterMedias,instagramMedias);
 		medias.data.sort(function(a,b) {
 			dateA = a.created_at;
 			dateB = b.created_at;
