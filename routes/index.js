@@ -11,6 +11,7 @@ router.get('/', function(req, res, next) {
 
 var db = mongojs('mongolab_user:CS4261_user@ds031561.mongolab.com:31561/heroku_app33937405');
 var featured = db.collection('featured');
+var userRating = db.collection('user_rating');
 
 if (db !== undefined) {
 	console.log("db connection OK");
@@ -18,6 +19,10 @@ if (db !== undefined) {
 
 if (featured !== undefined) {
 	console.log("featured collection OK");
+}
+
+if (userRating !== undefined) {
+	console.log("user_rating collection OK");
 }
 
 function createCompleteUrl(url, requestParams) {
@@ -41,7 +46,7 @@ function createCompleteUrl(url, requestParams) {
 /* GET yelp data */
 router.get('/places', function(req, res, next) {
 	var yelpPlaces = [];
-	var featuredPlaces = [];
+	var dbPlaces = [];
 
 	var radius;
 
@@ -94,7 +99,7 @@ router.get('/places', function(req, res, next) {
 			});
 		},
 
-		/*Call to MongoDB to get the list of close featured places*/
+		/*Call to MongoDB to get the list of close rated/featured places*/
 		function(callback){
 
 			featured.find({
@@ -111,7 +116,7 @@ router.get('/places', function(req, res, next) {
 				if (err !== null) {
 					console.log(err);
 				} else {
-					featuredPlaces = docs;
+					dbPlaces = docs;
 				}
 
 				callback();
@@ -119,7 +124,7 @@ router.get('/places', function(req, res, next) {
 		}
 	],
 	function(err) {
-		console.log("featuredPlaces length: " + featuredPlaces.length);
+		console.log("dbPlaces length: " + dbPlaces.length);
 
 		var places = {
 			category: section,
@@ -139,10 +144,14 @@ router.get('/places', function(req, res, next) {
 			places.businesses[j].rating = yelpPlaces[j].rating;
 			places.businesses[j].address = yelpPlaces[j].location.display_address;
 
-			if (featuredPlaces.length !== 0) {
-				for (var i = 0; i < featuredPlaces.length; i++) {
-					if (featuredPlaces[i]._id == yelpPlaces[j].id) {
-						places.businesses[j].featuredValue = featuredPlaces[i].investment;
+			if (dbPlaces.length !== 0) {
+				for (var i = 0; i < dbPlaces.length; i++) {
+					if (dbPlaces[i]._id == yelpPlaces[j].id) {
+						places.businesses[j].featuredValue = dbPlaces[i].investment;
+						voteNb = dbPlaces[i].vote_nb;
+						voteMean = dbPlaces[i].vote_mean;
+						places.businesses[j].rating = (10*places.businesses[j].rating + voteNb*voteMean)/(10 + voteNb);
+
 					} else {
 						places.businesses[j].featuredValue = 0;
 					}
@@ -312,6 +321,138 @@ router.get('/medias', function(req, res, next) {
 });
 
 
+
+/*POST to create/update the vote of the user
+body format: {
+username: "username" (String),
+userId: user_id (Long),
+placeId: "yelp generated Place id" (String),
+rating: rating of the user (Float),
+lng: longitude of the place (Float),
+lat: latitude of the place (Float),
+placeName: "name of the place" (String)
+}
+
+*/
+router.post('/places/vote', function(req, res, next) {
+
+	var date = new Date();
+	var body = req.body;
+	//var body = JSON.parse(req.body);
+	console.log(body);
+
+
+	var featuredPlace = {
+		_id: body.placeId,
+  	name: body.placeName,
+  	loc: {
+	      type: "Point",
+	      coordinates: [
+	          body.lng,
+	          body.lat
+	      ]
+	  },
+  	investment: 0,
+  	vote_nb: 1,
+  	vote_mean: parseFloat(body.rating)
+	};
+
+	async.parallel([
+
+		// Create/Update the vote in the user_rating table
+		function(callback){
+			userRating.update({
+				user_id: body.userId,
+				place_id: body.placeId
+			},{
+				username: body.username,
+				user_id: body.userId,
+				place_id: body.placeId,
+				rating: parseFloat(body.rating),
+      	created_at: date.toString()
+			},{
+				upsert: true
+			}, function() {
+    		console.log("user_rating entry updated");
+				callback();
+			});
+		},
+
+		// Create/Update the vote in the user_rating table
+		function(callback){
+			async.series([
+
+				//Retrieves the informations in the featured table
+				function(callback){
+					featured.findOne({_id: body.placeId}, function(err,doc) {
+						console.log("featured db call: " + doc);
+
+						if (doc !== null) {
+							featuredPlace.name = doc.name;
+							featuredPlace.loc = doc.loc;
+							featuredPlace.investment = doc.investment;
+							featuredPlace.vote_nb = doc.vote_nb + 1;
+							featuredPlace.vote_mean = (parseFloat(doc.vote_mean)*doc.vote_nb + featuredPlace.vote_mean)/(featuredPlace.vote_nb);
+						}
+
+						callback();
+					});
+				},
+
+				//Update or create the informations in the featured table
+				function(callback){
+					featured.update({
+						_id: featuredPlace._id
+					},{
+						_id: featuredPlace._id,
+						name: featuredPlace.name,
+						loc: {type: "Point",coordinates: [parseFloat(featuredPlace.loc.coordinates[0]),parseFloat(featuredPlace.loc.coordinates[1])]},
+						investment: featuredPlace.investment,
+						vote_nb: featuredPlace.vote_nb,
+						vote_mean: featuredPlace.vote_mean
+					},{
+						upsert: true
+					}, function(err) {
+		    		console.log("featured entry updated");
+						//console.log(featuredPlace);
+						console.log(err);
+						callback();
+					});
+				}
+			], callback);
+		}
+	], function(err){
+		console.log("End of the /places/vote call");
+		console.log(err);
+		res.send({
+			placeId: featuredPlace._id,
+			name: featuredPlace.name,
+			vote_nb: featuredPlace.vote_nb,
+			vote_mean: featuredPlace.vote_mean
+		});
+	});
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
+/******************************************************************************/
+/*********************************____________*********************************/
+/********************************| DEPRECATED |********************************/
+/********************************|____________|********************************/
+/*********************************            *********************************/
+/******************************************************************************/
+
+
 /* GET instagram place id */
 router.get('/media/instagram', function(req, res, next) {
 	var oauth = {
@@ -354,7 +495,7 @@ router.get('/media/instagram2', function(req, res, next) {
 
 	var requestParams = {
 		client_id: 'c40df6cf23aa448c9c2da9007284f8e6'
-	}
+	};
 
 	var requestUrl = createCompleteUrl(url, requestParams);
 	console.log('/MEDIA/INSTAGRAM2 requestUrl: ' + requestUrl);
@@ -393,34 +534,6 @@ router.get('/media/twitter', function(req, res, next) {
 	request.get({url:requestUrl, oauth:oauth, json:true},function (error, response, body) {
 		if (!error && response.statusCode == 200) {
 			res.send(body.statuses);
-		}
-		if (error) {
-			console.error('Error: ' + error);
-			console.log('Status Code: ' + response.statusCode);
-			res.sendStatus(response.statusCode);
-		}
-	});
-});
-
-/* GET foursquare request. */
-router.get('/places/foursquare', function(req, res, next) {
-	var url = 'https://api.foursquare.com/v2/venues/explore';
-
-	var requestParams = {
-		client_id: 'O0YY1XKVUHFMJY1B1Q04NHXMBAYLRS4IJRVLDWKYIKXER4AH',
-		client_secret: 'I3YZ5Y3UK20ZIDD5GMCBDR0ZMFJH0KWB5NRS1N03TMWAYAJW&v=20130815',
-		ll: req.query.loc, // example: '49.0,6.10'
-		radius: req.query.radius, //example '1000'
-		section: req.query.section,  //example 'food'
-		limit: 20
-	};
-
-	var requestUrl = createCompleteUrl(url,requestParams);
-	console.log('RequestUrl: ' + requestUrl);
-
-	request(requestUrl,function (error, response, body) {
-		if (!error && response.statusCode == 200) {
-			res.send(body);
 		}
 		if (error) {
 			console.error('Error: ' + error);
