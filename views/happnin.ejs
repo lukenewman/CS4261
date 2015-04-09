@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	  <title>Happnin</title>
+	  <meta charset="utf-8"></meta>
+		<meta content="IE=edge" http-equiv="X-UA-Compatible"></meta>
+		<meta content="width=device-width, initial-scale=1" name="viewport"></meta>
+	  <meta name="viewport" content="width=device-width, initial-scale=1">
+	  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+	  <link rel="stylesheet" href="/stylesheets/style.css" type="text/css">
+	</head>
+
+	<body>
+		<nav class="navbar navbar-inverse navbar-fixed-top">
+		  <div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+			  <a class="navbar-brand" href="#">Happnin</a>
+			</div>
+			<div class="collapse navbar-collapse" id="navbar">
+			  <ul class="nav navbar-nav">
+				<li><a href="#">What is Happnin?</a></li>
+				<li><a href="#systemBackend">How it works</a></li>
+				<li><a href="#video">Video</a></li>
+				<li><a href="#business">Happnin for businesses</a></li>
+				<li><a href="#aboutUs">About Us</a></li>
+			  </ul>
+			</div>
+		  </div>
+		</nav>
+
+		<!--<div class="jumbotron">-->
+			<div class="container">
+				<div class="row">
+					<div class="col-sm-12">
+						<br><br><br>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-4">
+						<img src="/images/LogoWoutBack.png" class="img-responsive center-block" alt="Responsive image"  width="200" height="200">
+					</div>
+					<div class="col-sm-8">
+						<h1>Find out what's Happnin !</h1>
+						<p>
+							"Happin will help you find a place based on what is really happening there"
+						</p>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-12">
+						<br><br><br>
+					</div>
+				</div>
+			</div>
+
+
+		<div class="coloredbackground">
+			<br>
+			<div class="container">
+			  <h2>What is Happnin ?</h2>
+			  <br>
+			  <div class="row">
+					<div class="col-sm-6" >
+						<img src="/images/1page.png" class="img-responsive center-block" alt="..." width="250" height="418" >
+					</div>
+					<div class="col-sm-6" >
+						<h4>Find relevant informations on a place</h4>
+						<br>
+					  <p class="text-justify">
+							It is quite usual to want to find a place to eat, or a place
+							where you will spend a memorable night. You could use one the
+							numerous apps that already exists. However, they usually use their
+							 own database, and their own rating system. The result is that you
+							 are forcing to choose a place based on 1-year old reviews (if
+							any).
+						</p>
+						<br>
+						<p class="text-justify">
+							 Happnin try to solve this problem: you get instead a feed
+							from the most popular social medias (currently Instagram and
+							Twitter) to get a feel of what is really happening there ! A
+							surprise concert is taking place at this bar ? People will surely
+							tweet about that, and you won't miss it out ! On top of that, we
+							built our own buzzmeter: rate the place on how it is now, your
+							rating will disappear when it becomes outdated.
+						</p>
+						<br>
+					  <p>You can easily find informations about:</p>
+					  <ul>
+							<li>Restaurants</li>
+							<li>Cafes</li>
+							<li>Clubs</li>
+							<li>Bars</li>
+					  </ul>
+					</div>
+			  </div>
+			  <br>
+			  <div class="row">
+					<div class="col-sm-6" >
+						<br>
+						<h4>How can you use it ?</h4>
+						<br>
+						<p class="text-justify">
+							The most obvious way to use Happnin is when you want to find
+							something to do or somewhere to go. There is nothing easier than
+							that: pull up the app, and you will be presented with a list of
+							restaurants / cafes / clubs or bars around you (this list comes
+							from the biggest database of venues available as of today: Yelp !)
+							. From there, you can easily look up the feed of tweets or
+							Instagram posts relative to this place, to get a feel of what is
+							going on there. Besides, you can easily get directions to go there
+							or call the place to make a reservation in two seconds.
+						</p>
+						<br>
+						<p class="text-justify">
+							But what if you are planning to spend the evening in another city?
+							We also thought of the heavy travelers, and you can actually use
+							Happnin to look up places in any city in the world. How nice is
+							that ?
+						</p>
+					</div>
+					<div class="col-sm-6" >
+						<img src="/images/2page.png" class="img-responsive center-block" alt="..." width="250" height="418">
+					</div>
+			  </div>
+
+			</div>
+			<br>
+		</div>
+
+		<div  id="systemBackend">
+			<br>
+			<div class="container">
+				<h2>How does it work?</h2>
+				<p class="text-justify">
+					The whole thing is based on a clever use of the available APIs. What
+					is happening behind the scene for every requests is the following:
+					<ul>
+						<li>We retrieve your current location or the location you are
+						searching, plus the type of venues you are looking for and send it
+						to our server </li>
+						<li>From there, we get a list of relevant places from Yelp</li>
+						<li>We add our own informations on top of those from Yelp</li>
+						<li>Once the user has chosen a place, we get the most recent tweets
+						that happened there, and the Instagram photos posted there</li>
+					</ul>
+				</p>
+				<br>
+				<p class="text-justify">
+					You can find a compact representation of the process below:
+				</p>
+				<br>
+				<img class="img-responsive" src="/images/Archi.jpg" alt="">
+			</div>
+			<br>
+		</div>
+
+
+		<div class="coloredbackground" id="video">
+			<br>
+			<div class="container">
+			  <h2>Video</h2>
+			  <iframe width="420" height="315" src="https://www.youtube.com/embed/a6oRnE_x3OE" frameborder="0" allowfullscreen></iframe>
+			</div>
+			<br>
+		</div>
+
+
+		<div class="container" id="business">
+			<br>
+			<div class="row">
+				<div class="col-sm-6" >
+					<br>
+					<h2>Happnin for businesses</h2>
+					<br>
+					<p class="text-justify">
+						Owner of a restaurant / cafes / clubs / bars ? We have just the tool
+						you need !
+					</p>
+					<br>
+					<p class="text-justify">
+						Happnin lets you get premium visibility : your businesses
+						will benefit from maximum exposure in our app for a small monthly
+						fee.
+					</p>
+					<p class="text-justify">
+						But there is more: you will get you very own channel in the app
+						, displayed directly in the social media feed. This means you will
+						able to reach your clients more easily, and send out coupons
+						directly. Get some insights on your clients with statistics
+						concerning your potential clients (not available yet).
+					</p>
+					<br>
+				</div>
+				<div class="col-sm-6" >
+					<img src="/images/3page.png" class="img-responsive center-block" alt="..." width="250" height="418">
+				</div>
+			</div>
+			<br>
+		</div>
+
+
+		<div class="coloredbackground">
+			<div class="container" id="aboutUs">
+				<br>
+				<h2>About us</h2>
+				<p>Meet the team members !</p>
+
+				<div class="row">
+					<div class="col-md-1 col-lg-1"></div>
+					<div class="col-sm-6 col-md-2 col-lg-2">
+							<img src="/images/0.png" alt="..." class="img-circle center-block" width="100" height="100">
+						<div class="caption">
+							<h5 style="text-align: center">Qisi Kang</h5>
+							<p class="small" style="text-align: center">Android dev</p>
+						</div>
+					</div>
+					<div class="col-sm-6 col-md-2 col-lg-2">
+							<img src="/images/0.png" alt="..." class="img-circle center-block" width="100" height="100">
+						<div class="caption">
+							<h5 style="text-align: center">Lucas Newman</h5>
+							<p class="small"  style="text-align: center">Backend & iOS dev</p>
+						</div>
+					</div>
+					<div class="col-sm-6 col-md-2 col-lg-2">
+							<img src="/images/0.png" alt="..." class="img-circle center-block" width="100" height="100">
+						<div class="caption">
+							<h5 style="text-align: center">Holly Parrish</h5>
+							<p class="small"  style="text-align: center">Design & UX</p>
+						</div>
+					</div>
+					<div class="col-sm-6 col-md-2 col-lg-2">
+							<img src="/images/0.png" alt="..." class="img-circle center-block" width="100" height="100">
+						<div class="caption">
+							<h5 style="text-align: center">Anish Sharma</h5>
+							<p class="small"  style="text-align: center">Business & Communication</p>
+						</div>
+					</div>
+					<div class="col-sm-6 col-md-2 col-lg-2">
+							<img src="/images/0.png" alt="..." class="img-circle center-block" width="100" height="100">
+						<div class="caption">
+							<h5 style="text-align: center">Jean-Baptiste Weibel</h5>
+							<p class="small" style="text-align: center">Backend & Android dev</p>
+						</div>
+					</div>
+					<div class="col-md-1 col-lg-1"></div>
+				</div>
+				<br>
+			</div>
+		</div>
+
+
+		<footer class="footer" role="contentinfo">
+			<br>
+			<br>
+			<div class="container">
+				<p> Designed and built by Happnin &#169 2015</p>
+			</div>
+			<br>
+		</footer>
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+	</body>
+</html>

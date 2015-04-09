@@ -6,7 +6,7 @@ var mongojs = require('mongojs');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-	res.render('index', { title: 'Express' });
+	res.render('happnin', { title: 'Express' });
 });
 
 var db = mongojs('mongolab_user:CS4261_user@ds031561.mongolab.com:31561/heroku_app33937405');
