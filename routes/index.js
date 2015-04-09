@@ -131,6 +131,10 @@ router.get('/places', function(req, res, next) {
 			businesses: []
 		};
 
+		if (yelpPlaces === undefined) {
+			yelpPlaces = [];
+		}
+
 		for (var j = 0; j < yelpPlaces.length; j++) {
 			places.businesses[j] = {};
 			places.businesses[j].id = yelpPlaces[j].id;
