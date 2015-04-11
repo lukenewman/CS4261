@@ -24,7 +24,7 @@
 			</div>
 			<div class="collapse navbar-collapse" id="navbar">
 			  <ul class="nav navbar-nav">
-				<li><a href="#">What is Happnin?</a></li>
+				<li><a href="#whatIs">What is Happnin?</a></li>
 				<li><a href="#systemBackend">How it works</a></li>
 				<li><a href="#video">Video</a></li>
 				<li><a href="#business">Happnin for businesses</a></li>
@@ -34,7 +34,6 @@
 		  </div>
 		</nav>
 
-		<!--<div class="jumbotron">-->
 			<div class="container">
 				<div class="row">
 					<div class="col-sm-12">
@@ -60,17 +59,23 @@
 			</div>
 
 
-		<div class="coloredbackground">
-			<br>
+		<div class="coloredbackground" id="whatIs">
 			<div class="container">
-			  <h2>What is Happnin ?</h2>
-			  <br>
+				<br>
+				<div class="row">
+					<div class="col-sm-12">
+						<br>
+						<h2>What is Happnin ?</h2>
+					  <br>
+					</div>
+				</div><!-- .row -->
+
 			  <div class="row">
 					<div class="col-sm-6" >
 						<img src="/images/1page.png" class="img-responsive center-block" alt="..." width="250" height="418" >
 					</div>
 					<div class="col-sm-6" >
-						<h4>Find relevant informations on a place</h4>
+						<h3>Find relevant informations on a place</h3>
 						<br>
 					  <p class="text-justify">
 							It is quite usual to want to find a place to eat, or a place
@@ -99,12 +104,13 @@
 							<li>Bars</li>
 					  </ul>
 					</div>
-			  </div>
+			  </div><!-- .row -->
+
 			  <br>
 			  <div class="row">
 					<div class="col-sm-6" >
 						<br>
-						<h4>How can you use it ?</h4>
+						<h3>How can you use it ?</h3>
 						<br>
 						<p class="text-justify">
 							The most obvious way to use Happnin is when you want to find
@@ -128,131 +134,165 @@
 					<div class="col-sm-6" >
 						<img src="/images/2page.png" class="img-responsive center-block" alt="..." width="250" height="418">
 					</div>
-			  </div>
-
-			</div>
+			  </div><!-- .row -->
+			</div><!-- .container -->
 			<br>
-		</div>
+		</div><!-- #whatIs -->
 
 		<div  id="systemBackend">
-			<br>
 			<div class="container">
-				<h2>How does it work?</h2>
-				<p class="text-justify">
-					The whole thing is based on a clever use of the available APIs. What
-					is happening behind the scene for every requests is the following:
-					<ul>
-						<li>We retrieve your current location or the location you are
-						searching, plus the type of venues you are looking for and send it
-						to our server </li>
-						<li>From there, we get a list of relevant places from Yelp</li>
-						<li>We add our own informations on top of those from Yelp</li>
-						<li>Once the user has chosen a place, we get the most recent tweets
-						that happened there, and the Instagram photos posted there</li>
-					</ul>
-				</p>
 				<br>
-				<p class="text-justify">
-					You can find a compact representation of the process below:
-				</p>
-				<br>
-				<img class="img-responsive" src="/images/Archi.jpg" alt="">
-			</div>
+				<div class="row">
+					<div class="col-sm-12">
+						<br>
+						<h2>How does it work?</h2>
+						<br>
+					</div>
+				</div><!-- .row -->
+
+				<div class="row">
+					<div class="col-sm-12">
+						<p class="text-justify">
+							The whole thing is based on a clever use of the available APIs. What
+							is happening behind the scene for every requests is the following:
+							<ul>
+								<li>We retrieve your current location or the location you are
+								searching, plus the type of venues you are looking for and send it
+								to our server </li>
+								<li>From there, we get a list of relevant places from Yelp</li>
+								<li>We add our own informations on top of those from Yelp</li>
+								<li>Once the user has chosen a place, we get the most recent tweets
+								that happened there, and the Instagram photos posted there</li>
+							</ul>
+						</p>
+						<br>
+						<p class="text-justify">
+							You can find a compact representation of the process below:
+						</p>
+						<br>
+						<img class="img-responsive" src="/images/Archi.jpg" alt="">
+					</div>
+				</div><!-- .row -->
+			</div><!-- .container -->
 			<br>
-		</div>
+		</div><!-- #systemBackend -->
 
 
 		<div class="coloredbackground" id="video">
-			<br>
 			<div class="container">
-			  <h2>Video</h2>
-			  <iframe width="420" height="315" src="https://www.youtube.com/embed/a6oRnE_x3OE" frameborder="0" allowfullscreen></iframe>
-			</div>
-			<br>
-		</div>
-
-
-		<div class="container" id="business">
-			<br>
-			<div class="row">
-				<div class="col-sm-6" >
-					<br>
-					<h2>Happnin for businesses</h2>
-					<br>
-					<p class="text-justify">
-						Owner of a restaurant / cafes / clubs / bars ? We have just the tool
-						you need !
-					</p>
-					<br>
-					<p class="text-justify">
-						Happnin lets you get premium visibility : your businesses
-						will benefit from maximum exposure in our app for a small monthly
-						fee.
-					</p>
-					<p class="text-justify">
-						But there is more: you will get you very own channel in the app
-						, displayed directly in the social media feed. This means you will
-						able to reach your clients more easily, and send out coupons
-						directly. Get some insights on your clients with statistics
-						concerning your potential clients (not available yet).
-					</p>
-					<br>
-				</div>
-				<div class="col-sm-6" >
-					<img src="/images/3page.png" class="img-responsive center-block" alt="..." width="250" height="418">
-				</div>
-			</div>
-			<br>
-		</div>
-
-
-		<div class="coloredbackground">
-			<div class="container" id="aboutUs">
 				<br>
-				<h2>About us</h2>
-				<p>Meet the team members !</p>
+				<div class="row">
+					<div class="col-sm-12">
+						<br>
+						<h2>Video</h2>
+						<br>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-12">
+				  	<iframe width="420" height="315" src="https://www.youtube.com/embed/a6oRnE_x3OE" frameborder="0" allowfullscreen></iframe>
+					</div>
+				</div>
+				<br>
+			</div>
+		</div>
+
+		<div id="business">
+			<div class="container">
+				<br>
+				<div class="row">
+					<div class="col-sm-12">
+						<br>
+						<h2>Happnin for businesses</h2>
+						<br>
+					</div>
+				</div><!-- .row -->
+
+				<div class="row">
+					<div class="col-sm-6" >
+						<br>
+						<br>
+						<br>
+						<p class="text-justify">
+							Owner of a restaurant / cafes / clubs / bars ? We have just the tool
+							you need !
+						</p>
+						<br>
+						<p class="text-justify">
+							Happnin lets you get premium visibility : your businesses
+							will benefit from maximum exposure in our app for a small monthly
+							fee.
+						</p>
+						<p class="text-justify">
+							But there is more: you will get you very own channel in the app
+							, displayed directly in the social media feed. This means you will
+							able to reach your clients more easily, and send out coupons
+							directly. Get some insights on your clients with statistics
+							concerning your potential clients (not available yet).
+						</p>
+						<br>
+					</div>
+					<div class="col-sm-6" >
+						<img src="/images/3page.png" class="img-responsive center-block" alt="..." width="250" height="418">
+					</div>
+				</div><!-- .row -->
+			</div><!-- .container -->
+			<br>
+		</div><!-- #business -->
+
+
+		<div class="coloredbackground" id="aboutUs">
+			<div class="container">
+				<div class="row">
+					<div class="col-sm-12">
+						<br>
+						<h2>About us</h2>
+						<p>Meet the team members !</p>
+						<br>
+					</div>
+				</div><!-- .row -->
 
 				<div class="row">
 					<div class="col-md-1 col-lg-1"></div>
 					<div class="col-sm-6 col-md-2 col-lg-2">
 							<img src="/images/0.png" alt="..." class="img-circle center-block" width="100" height="100">
 						<div class="caption">
-							<h5 style="text-align: center">Qisi Kang</h5>
-							<p class="small" style="text-align: center">Android dev</p>
+							<h5 class="text-center">Qisi Kang</h5>
+							<p class="small text-center">Android dev</p>
 						</div>
 					</div>
 					<div class="col-sm-6 col-md-2 col-lg-2">
 							<img src="/images/0.png" alt="..." class="img-circle center-block" width="100" height="100">
 						<div class="caption">
-							<h5 style="text-align: center">Lucas Newman</h5>
-							<p class="small"  style="text-align: center">Backend & iOS dev</p>
+							<h5 class="text-center">Lucas Newman</h5>
+							<p class="small text-center" >Backend & iOS dev</p>
 						</div>
 					</div>
 					<div class="col-sm-6 col-md-2 col-lg-2">
 							<img src="/images/0.png" alt="..." class="img-circle center-block" width="100" height="100">
 						<div class="caption">
-							<h5 style="text-align: center">Holly Parrish</h5>
-							<p class="small"  style="text-align: center">Design & UX</p>
+							<h5 class="text-center">Holly Parrish</h5>
+							<p class="small text-center" >Design & UX</p>
 						</div>
 					</div>
 					<div class="col-sm-6 col-md-2 col-lg-2">
 							<img src="/images/0.png" alt="..." class="img-circle center-block" width="100" height="100">
 						<div class="caption">
-							<h5 style="text-align: center">Anish Sharma</h5>
-							<p class="small"  style="text-align: center">Business & Communication</p>
+							<h5 class="text-center">Anish Sharma</h5>
+							<p class="small text-center" >Business & Communication</p>
 						</div>
 					</div>
 					<div class="col-sm-6 col-md-2 col-lg-2">
 							<img src="/images/0.png" alt="..." class="img-circle center-block" width="100" height="100">
 						<div class="caption">
-							<h5 style="text-align: center">Jean-Baptiste Weibel</h5>
-							<p class="small" style="text-align: center">Backend & Android dev</p>
+							<h5 class="text-center">Jean-Baptiste Weibel</h5>
+							<p class="small text-center">Backend & Android dev</p>
 						</div>
 					</div>
 					<div class="col-md-1 col-lg-1"></div>
-				</div>
+				</div><!-- .row -->
 				<br>
-			</div>
+			</div><!-- .container -->
 		</div>
 
 
@@ -260,9 +300,9 @@
 			<br>
 			<br>
 			<div class="container">
-				<p> Designed and built by Happnin &#169 2015</p>
-			</div>
-			<br>
+				<p class="text-center"> Designed and built by Happnin &#169 2015</p>
+				<br>
+			</div><!-- .container -->
 		</footer>
 
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
