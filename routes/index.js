@@ -92,8 +92,9 @@ router.get('/places', function(req, res, next) {
 				}
 				if (error) {
 					console.error('Error: ' + error);
-					console.log('Status Code: ' + response.statusCode);
-					res.sendStatus(response.statusCode);
+					var statusCode = (response !== undefined) ? response.statusCode : "";
+					console.log('Status Code: ' + statusCode);
+					res.sendStatus(statusCode);
 				}
 				callback();
 			});
@@ -202,7 +203,8 @@ router.get('/medias', function(req, res, next) {
 					twitterMedias = body.statuses;
 				} else {
 					console.error('Error: ' + error);
-					console.log('Status Code: ' + response.statusCode);
+					var statusCode = (response !== undefined) ? response.statusCode : "";
+					console.log('Status Code: ' + statusCode);
 				}
 				callback();
 			});
@@ -233,7 +235,8 @@ router.get('/medias', function(req, res, next) {
 							}
 						} else {
 							console.error('Error: ' + error);
-							console.log('Status code: ' + response.statusCode);
+							var statusCode = (response !== undefined) ? response.statusCode : "";
+							console.log('Status Code: ' + statusCode);
 						}
 						callback();
 					});
@@ -262,7 +265,8 @@ router.get('/medias', function(req, res, next) {
 							instagramMedias = body.data;
 						} else {
 							console.error('Error: ' + error);
-							console.log('Status code: ' + response.statusCode);
+							var statusCode = (response !== undefined) ? response.statusCode : "";
+							console.log('Status Code: ' + statusCode);
 						}
 						callback();
 					});
@@ -481,8 +485,9 @@ router.get('/media/instagram', function(req, res, next) {
 		}
 		if (error) {
 			console.error('Error: ' + error);
-			console.log('Status code: ' + response.statusCode);
-			res.sendStatus(response.statusCode);
+			var statusCode = (response !== undefined) ? response.statusCode : "";
+			console.log('Status Code: ' + statusCode);
+			res.sendStatus(statusCode);
 		}
 	});
 });
@@ -510,8 +515,9 @@ router.get('/media/instagram2', function(req, res, next) {
 		}
 		if (error) {
 			console.error('Error: ' + error);
-			console.log('Status code: ' + response.statusCode);
-			res.sendStatus(response.statusCode);
+			var statusCode = (response !== undefined) ? response.statusCode : "";
+			console.log('Status Code: ' + statusCode);
+			res.sendStatus(statusCode);
 		}
 	});
 });
@@ -541,8 +547,9 @@ router.get('/media/twitter', function(req, res, next) {
 		}
 		if (error) {
 			console.error('Error: ' + error);
-			console.log('Status Code: ' + response.statusCode);
-			res.sendStatus(response.statusCode);
+			var statusCode = (response !== undefined) ? response.statusCode : "";
+			console.log('Status Code: ' + statusCode);
+			res.sendStatus(statusCode);
 		}
 	});
 });
