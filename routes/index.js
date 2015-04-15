@@ -138,16 +138,22 @@ router.get('/places', function(req, res, next) {
 
 		for (var j = 0; j < yelpPlaces.length; j++) {
 			places.businesses[j] = {};
-			places.businesses[j].id = yelpPlaces[j].id;
-			places.businesses[j].name = yelpPlaces[j].name;
-			places.businesses[j].latitude = yelpPlaces[j].location.coordinate.latitude;
-			places.businesses[j].longitude = yelpPlaces[j].location.coordinate.longitude;
+			places.businesses[j].id = (yelpPlaces[j].id !== undefined)?yelpPlaces[j].id:"";
+			places.businesses[j].name = (yelpPlaces[j].name !== undefined)?yelpPlaces[j].name:"";
+			if ( yelpPlaces[j].location !== undefined) {
+				if (yelpPlaces[j].location.coordinate !== undefined) {
+					places.businesses[j].latitude = (yelpPlaces[j].location.coordinate.latitude !== undefined)? yelpPlaces[j].location.coordinate.latitude:"0.0";
+					places.businesses[j].longitude = (yelpPlaces[j].location.coordinate.longitude !== undefined)? yelpPlaces[j].location.coordinate.longitude:"0.0";
+				}
+				places.businesses[j].address = (yelpPlaces[j].location.display_address !== undefined)?yelpPlaces[j].location.display_address:"";
+			}
+			
 			places.businesses[j].phoneNumber = (yelpPlaces[j].phone !== undefined)?yelpPlaces[j].phone:"";
 			places.businesses[j].imageURL = (yelpPlaces[j].image_url !== undefined)?yelpPlaces[j].image_url:"";
-			places.businesses[j].isClosed = yelpPlaces[j].is_closed;
-			places.businesses[j].distance = yelpPlaces[j].distance;
-			places.businesses[j].rating = yelpPlaces[j].rating;
-			places.businesses[j].address = yelpPlaces[j].location.display_address;
+			places.businesses[j].isClosed = (yelpPlaces[j] !== undefined)? yelpPlaces[j].is_closed:"";
+			places.businesses[j].distance = (yelpPlaces[j] !== undefined)? yelpPlaces[j].distance:"";
+			places.businesses[j].rating = (yelpPlaces[j] !== undefined)? yelpPlaces[j].rating:"";
+			
 
 			if (dbPlaces.length !== 0) {
 				for (var i = 0; i < dbPlaces.length; i++) {
