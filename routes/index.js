@@ -9,6 +9,7 @@ router.get('/', function(req, res, next) {
 	res.render('happnin', { title: 'Express' });
 });
 
+// Open the database, and retrieve the featured and user_rating collection
 var db = mongojs('mongolab_user:CS4261_user@ds031561.mongolab.com:31561/heroku_app33937405');
 var featured = db.collection('featured');
 var userRating = db.collection('user_rating');
@@ -25,6 +26,10 @@ if (userRating !== undefined) {
 	console.log("user_rating collection OK");
 }
 
+
+/**
+* Utility function to transform a dictionary of paramters into a url ready for a GET request
+*/
 function createCompleteUrl(url, requestParams) {
 	var requestUrl = url;
 
@@ -43,7 +48,11 @@ function createCompleteUrl(url, requestParams) {
 	return requestUrl;
 }
 
-/* GET yelp data */
+
+/**
+* Function to handle the Http GET request at /places
+* Retrieves Yelp data and informations in the featured collection in parallel and mix them, then send them back to the user
+*/
 router.get('/places', function(req, res, next) {
 	var yelpPlaces = [];
 	var dbPlaces = [];
@@ -136,6 +145,8 @@ router.get('/places', function(req, res, next) {
 			yelpPlaces = [];
 		}
 
+		// Mix the data from Yelp and the database
+		// Never trust the JSON sent by Yelp (some fields don't exist)
 		for (var j = 0; j < yelpPlaces.length; j++) {
 			places.businesses[j] = {};
 			places.businesses[j].id = (yelpPlaces[j].id !== undefined)?yelpPlaces[j].id:"";
@@ -177,7 +188,11 @@ router.get('/places', function(req, res, next) {
 
 });
 
-/*GET medias*/
+
+/**
+* Function to handle the Http GET request at /medias
+* Retrieves Twitter(require only one call to the API) and Instagram (require two serial calls to the API) data in parallel and mix them, then send them back to the user
+*/
 router.get('/medias', function(req, res, next) {
 
 	var twitterMedias = [];
@@ -216,7 +231,10 @@ router.get('/medias', function(req, res, next) {
 			});
 
 		},
+
 		//Make a request to the Instagram API
+		//First, call Instagram API to get the instagram ID of the place from its location
+		//Then retrieves the Instagram posts for this location
 		function(callback) {
 			async.series([
 				//Get the instagram ID of the place
@@ -277,10 +295,10 @@ router.get('/medias', function(req, res, next) {
 						callback();
 					});
 				}
-			], callback); //Remember to put in the second series task's "task callback" as the "final callback" for the async.parallel operation
+			], callback);
 		}
 	], function(err) {
-		//This function gets called after the two parallel tasks have called their "task callbacks"
+
 		if (err) return console.error(err);
 
 		var medias = {
@@ -327,32 +345,30 @@ router.get('/medias', function(req, res, next) {
 			return 0;
 		});
 
-		// medias = {
-		// 	medias: twitterMedias
-		// };
 		res.send(medias);
 	});
 });
 
 
 
-/*POST to create/update the vote of the user
-body format: {
-username: "username" (String),
-userId: user_id (Long),
-placeId: "yelp generated Place id" (String),
-rating: rating of the user (Float),
-lng: longitude of the place (Float),
-lat: latitude of the place (Float),
-placeName: "name of the place" (String)
-}
 
+/**
+* Function to handle the Http POST request at /places/vote
+* Create/update the vote of the user
+* Sends the following informations to update the rating (user_rating keep track of individual rating 
+* whereas featured collection keeps the number of votes and average rating):
+* -username: "username" (String),
+* -userId: user_id (Long),
+* -placeId: "yelp generated Place id" (String),
+* -rating: rating of the user (Float),
+* -lng: longitude of the place (Float),
+* -lat: latitude of the place (Float),
+* -placeName: "name of the place" (String)
 */
 router.post('/places/vote', function(req, res, next) {
 
 	var date = new Date();
 	var body = req.body;
-	//var body = JSON.parse(req.body);
 	console.log(body);
 
 
@@ -371,6 +387,9 @@ router.post('/places/vote', function(req, res, next) {
   	vote_mean: parseFloat(body.rating)
 	};
 
+	// In parallel, updates the entry in the user_rating collection and deals with the featured collection
+	// There is two serial steps for the featured collection: first retrieve the entry (if any) corresponding
+	// to the place, then update its fields (or creates it if it doesn't exist)
 	async.parallel([
 
 		// Create/Update the vote in the user_rating table
@@ -446,118 +465,6 @@ router.post('/places/vote', function(req, res, next) {
 		});
 	});
 
-});
-
-
-
-
-
-
-
-
-
-
-
-
-/******************************************************************************/
-/*********************************____________*********************************/
-/********************************| DEPRECATED |********************************/
-/********************************|____________|********************************/
-/*********************************            *********************************/
-/******************************************************************************/
-
-
-/* GET instagram place id */
-router.get('/media/instagram', function(req, res, next) {
-	var oauth = {
-		client_id: 'c40df6cf23aa448c9c2da9007284f8e6',
-		client_secret: '8f83ed86028a498185a05bb4277fe601'
-	};
-
-	var url = 'https://api.instagram.com/v1/locations/search';
-
-	var requestParams = {
-		lat: req.query.loc.split(',')[0],
-		lng: req.query.loc.split(',')[1],
-		client_id: 'c40df6cf23aa448c9c2da9007284f8e6'
-	};
-
-	var requestUrl = createCompleteUrl(url, requestParams);
-	console.log('MEDIA/INSTAGRAM requestUrl: ' + requestUrl);
-
-	request.get(requestUrl, function(error, response, body) {
-		if (!error && response.statusCode == 200) {
-			res.send(body);
-		}
-		if (error) {
-			console.error('Error: ' + error);
-			var statusCode = (response !== undefined) ? response.statusCode : "";
-			console.log('Status Code: ' + statusCode);
-			res.sendStatus(statusCode);
-		}
-	});
-});
-
-/* GET instagram media for place id */
-router.get('/media/instagram2', function(req, res, next) {
-	var oauth = {
-		client_id: 'c40df6cf23aa448c9c2da9007284f8e6',
-		client_secret: '8f83ed86028a498185a05bb4277fe601'
-	};
-
-	// https://api.instagram.com/v1/locations/271364243/media/recent?client_id=...
-	var url = 'https://api.instagram.com/v1/locations/' + req.query.id + 'media/recent';
-
-	var requestParams = {
-		client_id: 'c40df6cf23aa448c9c2da9007284f8e6'
-	};
-
-	var requestUrl = createCompleteUrl(url, requestParams);
-	console.log('/MEDIA/INSTAGRAM2 requestUrl: ' + requestUrl);
-
-	request.get(requestUrl, function(error, response, body) {
-		if (!error && response.statusCode == 200) {
-			res.send(body);
-		}
-		if (error) {
-			console.error('Error: ' + error);
-			var statusCode = (response !== undefined) ? response.statusCode : "";
-			console.log('Status Code: ' + statusCode);
-			res.sendStatus(statusCode);
-		}
-	});
-});
-
-/* GET twitter data */
-router.get('/media/twitter', function(req, res, next) {
-
-	var oauth = {
-		consumer_key: '7IYF9oKnPLDEta86RqtyehHVG',
-		consumer_secret: 'a7WnvHk0fOlRSEuvGVgcIvO9gsiYgRNZWb0wrQgkL9RQAUaKpz',
-		token: '3059932155-cle3iD7vkXjnd7bHHTPBMQrgVDv7YoFIxR2xx3t',
-		token_secret: 'TkdySo3XL17tIi1jBcYwpOhsLPMgiyBE5BAjXUtu3xfQd'
-	};
-
-	var url = 'https://api.twitter.com/1.1/search/tweets.json';
-	var requestParams = {
-		q: req.query.q,
-		geocode: req.query.loc+ ',1km'
-	};
-
-	var requestUrl = createCompleteUrl(url, requestParams);
-	console.log('MEDIA/TWITTER requestUrl: ' + requestUrl);
-
-	request.get({url:requestUrl, oauth:oauth, json:true},function (error, response, body) {
-		if (!error && response.statusCode == 200) {
-			res.send(body.statuses);
-		}
-		if (error) {
-			console.error('Error: ' + error);
-			var statusCode = (response !== undefined) ? response.statusCode : "";
-			console.log('Status Code: ' + statusCode);
-			res.sendStatus(statusCode);
-		}
-	});
 });
 
 module.exports = router;
